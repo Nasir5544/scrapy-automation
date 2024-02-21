@@ -5,9 +5,20 @@ from Ecc.itemloaders import EccItemLoader
 import pymongo
 
 class EccSpider(scrapy.Spider):
+    custom_settings = {
+       'ITEM_PIPELINES': {
+            'Ecc.pipelines.EccPipeline': 100,
+           # 'Ecc.pipelines.GPWMongoDBPipeline': 200,
+            'Ecc.pipelines.MongoDBPipeline': 300,
+           # 'Ecc.pipelines.AthexnewsDBPipeline': 400,
+        }
+         
+    }
+  
     name = "ecc"
     allowed_domains = ["www.ecc.de"]
     start_urls = ["https://www.ecc.de/en/newsroom/circulars"]
+   
 
     def parse(self, response):
         for row in response.css('table tr'):

@@ -5,28 +5,26 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pymongo
 
-class GPWMongoDBPipeline:
-    def __init__(self):
-        self.client = MongoClient("mongodb+srv://mongo:PNJg1god7O4VAMMr@cluster0.p6vsysp.mongodb.net/?retryWrites=true&w=majority", tls=True, tlsAllowInvalidCertificates=True)
-        self.db = self.client["Gpwnewsscrapper"]
-        self.collection = self.db["gpw news testing"]
-        
-        # Create a unique index on the "title" field
-        self.collection.create_index("title", unique=True)
-        
-    def process_item(self, item, spider):
-        self.collection.insert_one(dict(item))
-        return item
+
 
 class GPWSpider(scrapy.Spider):
     custom_settings = {
+     'ITEM_PIPELINES': {
+            'Ecc.pipelines.EccPipeline': 100,
+            'Ecc.pipelines.GPWMongoDBPipeline': 200,
+            #'Ecc.pipelines.MongoDBPipeline': 300,
+           # 'Ecc.pipelines.AthexnewsDBPipeline': 400,
+        },
         "USER_AGENT": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36",
         "ROBOTSTXT_OBEY": False,
         "CONCURRENT_REQUESTS": 1,
         "CONCURRENT_REQUESTS_PER_DOMAIN": 16,
         "CONCURRENT_REQUESTS_PER_IP": 16,
         "DOWNLOAD_DELAY": 3,
+      #  "Ecc.pipelines.GPWMongoDBPipeline": 200,
+        
     }
+ 
 
     name = "gpw_spider"
     start_urls = [

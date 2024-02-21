@@ -62,7 +62,7 @@ class AthexnewsDBPipeline:
     def __init__(self):
         self.client = MongoClient("mongodb+srv://mongo:PNJg1god7O4VAMMr@cluster0.p6vsysp.mongodb.net/?retryWrites=true&w=majority", tls=True, tlsAllowInvalidCertificates=True)
         self.db = self.client["Athexnewsscrapper"]
-        self.collection = self.db["gpw news testing"]
+        self.collection = self.db["athex news testing"]
         
         # Create a unique index on the "title" field
         self.collection.create_index("title", unique=True)
