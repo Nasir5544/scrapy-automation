@@ -65,10 +65,10 @@ DOWNLOAD_DELAY = 50
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    "Ecc.pipelines.EccPipeline": 100,
-    "Ecc.pipelines.GPWMongoDBPipeline": 200,
-    "Ecc.pipelines.MongoDBPipeline": 300,
-    "Ecc.pipelines.AthexnewsDBPipeline":400,
+   # "Ecc.pipelines.EccPipeline": 100,
+    #"Ecc.pipelines.GPWMongoDBPipeline": 200,
+    #"Ecc.pipelines.MongoDBPipeline": 300,
+    #"Ecc.pipelines.AthexnewsDBPipeline":400,
      
 }
 

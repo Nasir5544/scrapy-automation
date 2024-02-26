@@ -1,10 +1,11 @@
 # ecc_project/spiders/ecc_spider.py
 import scrapy
-from Ecc.items import EccItem
-from Ecc.itemloaders import EccItemLoader
-import pymongo
+from Ecc.itemloaders import ECCProductLoader
+from Ecc.items import EcccircularsdataItem
 
-class EccSpider(scrapy.Spider):
+
+
+class EccSpiderSpider(scrapy.Spider):
     custom_settings = {
        'ITEM_PIPELINES': {
             'Ecc.pipelines.EccPipeline': 100,
@@ -14,52 +15,49 @@ class EccSpider(scrapy.Spider):
         }
          
     }
-  
-    name = "ecc"
-    allowed_domains = ["www.ecc.de"]
+    
+    name = "Ecc_spider"
+    allowed_domains = ["ecc.de"]
     start_urls = ["https://www.ecc.de/en/newsroom/circulars"]
-   
+
 
     def parse(self, response):
-        for row in response.css('table tr'):
-            h3 = row.css('h3::text').get()
-            if h3:
-                item_loader = EccItemLoader(item=EccItem(), selector=row)
-                item_loader.add_value('title', h3)
-                date = row.css('time::text').get().strip()
-                if date:
-                    item_loader.add_value('date', date)
-                link = row.css('a::attr(href)').get()
-                if link:
-                    item_loader.add_value('link', response.urljoin(link))
+       
+        table_rows = response.css("table tr")
+        for row in table_rows[1:11]:
+            loader = ECCProductLoader(item=EcccircularsdataItem(), selector=row)
 
-               # yield item_loader.load_item()
-                #yield response.follow(link, callback=self.parse_detail, meta={'item_loader': item_loader})
-               
-                
-                item = item_loader.load_item()
-                yield item
+            # Use the loaders to load the item fields
+            loader.add_css('date', 'time::text')
+            loader.add_css('circularwithdate', 'h3::text')
+            loader.add_css('title', 'h3::text')
+            loader.add_css('titlelink', 'td a::attr(href)')  
+            loader.add_css('pdflink', 'td.download a::attr(href)')
 
-                # Follow the link to the detail page and pass the item to the parse_detail method
-                yield response.follow(link, callback=self.parse_detail, meta={'item': item})
-               # yield response.follow(item['url'], callback=self.parse_detail, meta={'item': item})
+            #Follow the link to the detail page
+            item = loader.load_item()
+            
+            #Print the 'title' and 'additional_title' parts
+            print(item['title'])
+            print(item['circularwithdate'])
 
-        next_page = response.css('li.next a::attr(href)').get()
+            yield response.follow(item['titlelink'], self.parse_detail, meta={'item': item})
+
+        next_page = response.css(".next a::attr(href)").get()
         if next_page is not None:
             next_page_url = response.urljoin(next_page)
             yield scrapy.Request(next_page_url, callback=self.parse)
-    
+
     def parse_detail(self, response):
         item = response.meta['item']
         
         # Extract the description from the detail page using ItemLoader
-        item_loader = EccItemLoader(item=item, selector=response)
+        item_loader = ECCProductLoader(item=item, selector=response)
         # Use getall() to get all the text within <p> tags
-        summary = response.css('p::text').getall()
+        descriptions = response.css('p::text').getall()
         # Join the list of description text with line breaks to form a single string
-        summary_text = ''.join(summary)
-        #
+        description_text = '\n'.join(descriptions)
         # Add the combined description text to the 'description' field
-        item_loader.add_value('summary',  summary_text)
+        item_loader.add_value('description', description_text)
 
         yield item_loader.load_item()
