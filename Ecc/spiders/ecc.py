@@ -50,6 +50,7 @@ class EccSpiderSpider(scrapy.Spider):
 
     def parse_detail(self, response):
         item = response.meta['item']
+    
         
         # Extract the description from the detail page using ItemLoader
         item_loader = ECCProductLoader(item=item, selector=response)

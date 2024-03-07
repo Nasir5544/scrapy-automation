@@ -32,7 +32,7 @@ class GPWSpider(scrapy.Spider):
     ]
 
     def start_requests(self):
-        options = webdriver.ChromeOptions()
+        options = webdriver.ChromeOptions() 
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
         chrome_options = webdriver.ChromeOptions()
